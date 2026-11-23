@@ -59,3 +59,24 @@ E2EE protects message contents from the relay **only while clients encrypt corre
 - No claim of original cryptography or uniquely novel agent messaging.
 
 Security review, negative tests, key-substitution tests, client supply-chain verification, and threat-model review are required before any external production release.
+
+
+## 7. Multi-discovery threats
+
+Discovery sources (search results, web pages, well-known JSON, A2A agent cards, skill files, CLI text, and invitations) are **untrusted until authenticated**. None may supersede host instructions or grant permission. A malicious discovery document may present spoofed endpoints, substitute public keys, introduce misleading instructions, leak credentials or point the server to an internal network address.
+
+Discovery resolution must distinguish evidence of service control (for example, an HTTPS origin) from independently verified identity and cryptographic recipient-key binding. Protect fetchers from SSRF, redirects to private network space, excessive payloads, unknown hosts and downgrade attacks. Never follow a discovery claim into a private API without explicit host approval.
+
+No public search directory of private user endpoints, leaked partner inventories or room membership. Direct invitations contain only non-secret locators and require a separate authenticated acceptance.
+
+## 8. Service-originated messaging versus unreadable participant messaging
+
+The infrastructure may generate **only its own explicitly attributed** administrative or invitation messages. It may forward third-party ciphertext without decrypting. It may not present itself as a human principal or read message bodies through a relay or elevated server scope.
+
+Sensitive client-authored JSON must be encrypted on the originating endpoint, not first assembled in plaintext by the service. The server must not store the original plaintext. For any given ciphertext, only cryptographically designated authorized recipients should have the necessary key material.
+
+**Do not conflate:** the ability to submit ciphertext (`message:send`), route it (`message:relay`), retrieve authorized encrypted records (`message:receive`), or decrypt locally with a private key. A lease governs allowed operations; it does not make missing decryption keys available.
+
+## 9. No blockchain or hash-ledger requirement for MVP
+
+Operational logging, retries, replay detection and data retention remain necessary for reliability. They do **not** imply a blockchain, distributed trust layer, cryptocurrency or hash-chained event system. Such a system would need a separate threat model, independent verifier and explicit phase approval. GitHub is not a message ledger.

@@ -71,3 +71,22 @@ Its technical building blocks are not new: A2A, ANP, DIDComm, Matrix, MLS, and e
 ## 8. Product success criterion
 
 Two independently launched clients, including at least one agent adapter and one human interface, can provision their own endpoints, demonstrate separate permissions, create a room with mutual authorization, exchange authenticated end-to-end encrypted messages, retrieve messages after an offline interval, and prevent further deliveries through a revoked lease. This must work **without MCP and without PumpkinMe**.
+
+
+## 9. Multiple discovery paths, one protocol
+
+Discovery is a product feature with independent entry routes: ordinary web search, domain-based `/.well-known/paep.json`, A2A-compatible agent cards, Agent Skills, CLI/Code Mode, and direct endpoint/room invitations. These are not six competing business APIs: they all lead to the same PAEP capability contract and verified endpoint authorization. No global central registry is required for the first version.
+
+Three different questions must remain separate: (a) how does a client discover that PAEP exists, (b) how does it locate a particular compatible PAEP service, and (c) how does it locate an intended communication partner? A known-domain well-known URL addresses (b), **not** (a). A direct invitation may address (c), but is **not** itself permission to join a room. See [Discovery Architecture](DISCOVERY.md).
+
+## 10. Communication authority and encrypted JSON
+
+The PAEP service is an infrastructure participant only when explicitly identified as such. It may issue its own signed administrative messages (e.g., a pairing request, delivery error, lease expiry notice) and relay other parties' ciphertext. It **must not** decrypt third-party confidential messages or impersonate the human/agent sender. Separate capabilities for message creation, relay and decryption are essential; possession of a lease is not possession of a private key.
+
+Endpoint JSON is generated on demand. Confidential client-authored JSON fields and message payloads are encrypted **at their originating client**, before the server receives them. PAEP needs only the minimum plaintext routing, key-binding and authorization metadata to process them. Encrypting JSON after constructing it in plaintext on the server would **not** protect it from that server.
+
+People and AI agents use distinct keys and permitted recipient sets. ChatGPT or any external LLM cannot read a message unless an authorized client deliberately gives that plaintext to it; once shared with an AI host, the host's data handling applies.
+
+## 11. Blockchain is explicitly post-MVP
+
+A blockchain, distributed consensus, token, miner, smart contract and blockchain-backed identity are **not** part of the first product. The MVP uses the minimum ordinary persistence and operational audit necessary for correct delivery and revocation. A hash-chained ledger or external notarization may be investigated later only against a demonstrated integrity requirement; neither is an implied dependency now.

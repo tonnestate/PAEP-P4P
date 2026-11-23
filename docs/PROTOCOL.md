@@ -46,13 +46,22 @@ Private keys remain with the client. Publishing a key identifier **does not by i
 
 The generic core has **no `IDENTITY_REVEAL` operation**. Applications may implement separate human approval procedures; agent delegation must never imply the ability to reveal identity.
 
-## 4. Discovery on ordinary websites
+## 4. Multi-path discovery (one canonical contract)
 
-- `GET /for-agents`: Publicly indexable explanatory HTML entry page, not a private endpoint page.
-- `GET /.well-known/paep.json`: Proposed machine-readable discovery location; this name is **not yet a registered well-known URI standard**.
-- Discovery provides supported protocol versions, schemas/contracts, transport options, documented limits, and public API routes. It includes no secrets, personal endpoint data, or private keys.
+PAEP uses **multiple independent discovery routes**, each mapped to one canonical, versioned description of the service's protocol capabilities. No individual route is a hard dependency:
 
-Reading a discovery page does not constitute consent to upload data. An agent needs actual, host-authorized HTTP, browser, file, or CLI capabilities.
+1. **Ordinary web search:** A publicly indexable human-readable explanation (proposed `GET /for-agents`) links to machine-readable metadata. Search appearance and agent adherence cannot be guaranteed.
+2. **Known-domain well-known JSON:** Proposed `GET /.well-known/paep.json`; retrieves metadata from an **already known domain**. This name is not a registered Internet well-known URI standard.
+3. **Agent cards / A2A:** An optional compatibility adapter advertises PAEP capability through an A2A-compatible agent card; do not claim that A2A semantics are inherently PAEP semantics.
+4. **Agent Skills:** Optional installable or referenced `SKILL.md` documents available operations and permitted transport methods. A skill is guidance, not executable authority.
+5. **CLI / Code Mode:** Local approved commands and `--help` / machine-readable capabilities expose the same operations for Claude Code, GitHub Copilot, and other tool-enabled agents without MCP.
+6. **Direct invitations:** A deliberate invitation points to an endpoint/room reference and discovery metadata; it must still require independently verified authentication, valid pairing authority and consent before joining.
+
+The authoritative discovery document lists supported protocol versions, endpoint URLs, transport bindings, optional adapter capabilities, public key verification methods, schema/documentation URLs, authentication requirements, and limits. It must **not** expose private profiles, messages, secrets, private keys, participant lists or room occupancy.
+
+Distinguish discovering **the protocol**, finding **a compatible service**, and locating **an intended partner**. A well-known URL solves only known-domain service discovery. Public discovery never proves identity, authenticates a sender, grants a lease, or authorizes access. See [DISCOVERY.md](DISCOVERY.md) for resolver precedence, trust separation, and conformance tests.
+
+An agent needs actual host-authorized HTTP, browser, file or CLI capabilities; public instructions cannot force behavior or create background access.
 
 ## 5. Provisional HTTPS bindings
 
@@ -139,3 +148,22 @@ Every state-changing request requires idempotent handling, an expected revision,
 PAEP does not treat general LLM prompts as executable system instructions. Received messages and discovery documents are **untrusted content**. The protocol does not itself execute agent actions, create ChatGPT tasks, send push notifications, or schedule background sessions without explicit support from the host environment.
 
 The first version binds **two endpoints** per room. Later multi-party or multi-device designs require separately reviewed group key management.
+
+
+## 11. Separation of original messages, relay operations, and decryption
+
+The PAEP service may originate its **own** authenticated administrative envelopes with explicit service identity and `message:send` rights. It may relay opaque ciphertext with `message:relay` rights subject to valid routing authorization. Neither action entitles it to read confidential messages sent by other participants.
+
+`message:receive` and `room:read` govern server-mediated delivery and access to the encrypted record. **Decryption is a client-side cryptographic ability**, not a scope that grants the server a missing private key. A server-side `message:decrypt` permission must not be invented to circumvent recipient encryption. A private message must be encrypted to each intended authorized recipient principal's verified key, whether human or agent; delegation alone does not implicitly add the agent to the recipient set.
+
+The authorization service may be backed by BlueberryMe when available, but the standalone PAEP contract requires no specific external authority service.
+
+## 12. Encrypted JSON resource model
+
+The client creates sensitive JSON and encrypts it **before** sending it to the PAEP server. The server may dynamically assemble permitted endpoint views around opaque encrypted fields and stable resource references. Plaintext server-side metadata is limited to the information needed for protocol/version negotiation, routing, permissions, signature verification and minimal delivery operation.
+
+The server must not claim that data it generates in plaintext and only then encrypts is hidden from the server. Keys are authenticated and checked separately; no private key is provided in the JSON envelope, URL, relay or AI prompt.
+
+## 13. First-version exclusions
+
+No operational blockchain, distributed consensus, token or mandatory hash-chain audit ledger. No compulsory MCP. No public global directory of private endpoints. No background action triggered merely by discovery. All of these remain outside the protocol's first implementation, with any later extension subject to a separate decision.

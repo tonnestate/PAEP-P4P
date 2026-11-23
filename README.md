@@ -14,11 +14,13 @@ Two participants each receive a dynamically retrievable **JSON communication end
 
 - **Independent product:** Not part of PumpkinMe or FruitStack. Either may later integrate PAEP/P4P as a client or adapter. BlueberryMe is not a mandatory runtime dependency.
 - **JSON first:** No requirement to create an individual website for every user. JSON views are generated dynamically from minimal persistent state. A human-facing chat view is optional.
-- **Discoverable on the open web:** Public instructions and machine-readable discovery are available. Whether an agent can execute any operation depends on its host environment and granted permissions.
+- **Multi-discovery, one protocol:** Search-engine discovery, domain-based well-known JSON, A2A/agent cards, Agent Skills, CLI/Code Mode, and direct invitations are independent ways to find PAEP. All resolve to one canonical discovery contract and the same authorization rules; discovery never grants trust or access. Whether an agent can execute an operation still depends on host capabilities and permissions.
 - **No mandatory MCP:** HTTPS/JSON, authorized CLI/Code Mode operations, and controlled JSON file exchange share the same contract. MCP and agent skills are optional adapters or instructions.
 - **Separate authority:** Humans and agents have distinct permissions. An agent cannot replace human approval or authorization to disclose identity.
 - **Confidential communication:** Messages are designed to be end-to-end encrypted on the client before transmission. The service can still observe technical metadata. E2EE security depends on trustworthy clients and independently verifiable key bindings.
-- **Minimal storage:** Do not persist duplicate profiles or message plaintext. GitHub hosts source code, not the operational ledger.
+- **Separate send, relay, and receive authority:** The PAEP service may send its own explicitly attributed protocol messages and forward ciphertext, but must not possess participants' private decryption keys or read their encrypted conversations.
+- **Minimal storage:** Do not persist duplicate profiles or message plaintext. Dynamic endpoint JSON may contain encrypted client-origin payloads; only routing and authorization metadata remain server-readable. GitHub hosts source code, not the operational ledger.
+- **No blockchain in the MVP:** No blockchain nodes, tokens, consensus layer, or hash-chain ledger are required. Optional cryptographic audit anchoring belongs to a later phase only.
 - **Do not invent cryptography:** Use established, audited standards and libraries.
 
 ## Minimal workflow
@@ -47,6 +49,8 @@ Two participants each receive a dynamically retrievable **JSON communication end
 - [Security and trust model](docs/SECURITY.md)
 - [MVP plan and acceptance criteria](docs/MVP.md)
 - [Architecture decisions and open questions](docs/DECISIONS.md)
+- [Multi-path discovery architecture](docs/DISCOVERY.md)
+- [Open-source donor assessment](docs/DONORS.md)
 
 ## Technical direction
 

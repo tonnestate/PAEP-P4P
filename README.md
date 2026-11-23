@@ -1,59 +1,59 @@
 # PAEP / P4P
 
-**Ein eigenständiges, herstellerunabhängiges Kommunikationsprotokoll für Menschen, Organisationen und ihre KI-Agenten.**
+**An independent, vendor-neutral communication protocol for people, organizations, and their AI agents.**
 
-**Status:** Produkt- und Protokollkonzept v0.1, 23. November 2026. Noch kein lauffähiger Server, kein bereitgestellter Tunnel, keine geprüfte Ende-zu-Ende-Verschlüsselung und keine nachgewiesene Integration in ChatGPT, Claude oder Copilot.
+**Status:** Product and protocol concept v0.1, November 23, 2026. There is no running server, deployed tunnel, verified end-to-end encryption, or demonstrated ChatGPT, Claude, or Copilot integration yet.
 
-## Idee in einem Satz
+## The idea in one sentence
 
-Zwei Teilnehmer erhalten jeweils einen dynamisch abrufbaren **JSON-Kommunikationsendpunkt**. PAEP verbindet diese Endpunkte über autorisierte, zweckgebundene Leases zu einem Kommunikationsraum. Menschen und ihre bevollmächtigten Agenten können dort mit getrennten Rechten kommunizieren; ein Transportadapter (zunächst n8n als geplanter Relay-Kandidat) befördert verschlüsselte Nachrichten, ohne die Klartexte verarbeiten zu müssen.
+Two participants each receive a dynamically retrievable **JSON communication endpoint**. PAEP links the endpoints into a communication room through authorized, purpose-bound leases. Humans and their delegated agents can communicate with separate permissions; a transport adapter (initially n8n as a proposed relay) carries encrypted messages without processing their plaintext.
 
-**P4P** bezeichnet das Kommunikationsmodell mit vier möglichen Rollen: Mensch A, Agent A, Mensch B, Agent B. Nicht alle vier Rollen müssen gleichzeitig besetzt oder online sein. Eine Seite kann auch eine Organisation mit menschlichem Vertreter und Agent sein.
+**P4P** denotes the communication model with four possible roles: Human A, Agent A, Human B, and Agent B. The four roles do not all need to be active or online simultaneously. Either side may also be an organization represented by a human and an agent.
 
-## Produktprinzipien
+## Product principles
 
-- **Eigenständiges Produkt:** Kein Teil von PumpkinMe oder FruitStack; diese können PAEP/P4P später als Clients beziehungsweise Adapter nutzen. Auch BlueberryMe ist keine zwingende Laufzeitabhängigkeit.
-- **JSON zuerst:** Keine Pflicht, pro Nutzer eine Webseite anzulegen. JSON-Ansichten werden aus minimalen persistenten Zuständen dynamisch erzeugt. Eine menschliche Chatansicht bleibt optional.
-- **Weg über das offene Web:** Öffentlich auffindbare Anleitung und maschinenlesbare Discovery; die Fähigkeit eines konkreten Agenten, Aktionen auszuführen, hängt von seinem Host und dessen Freigaben ab.
-- **Kein MCP-Zwang:** HTTPS/JSON, freigegebene CLI/Code-Mode-Aktionen und kontrollierter JSON-Dateiaustausch nutzen denselben Vertrag. MCP und Agent Skills sind optionale Adapter beziehungsweise Anleitungen.
-- **Getrennte Autorität:** Mensch und Agent besitzen getrennte Berechtigungen; ein Agent kann keine menschliche Zustimmung oder Identitätsfreigabe ersetzen.
-- **Vertrauliche Kommunikation:** Nachrichten werden vor dem Transport clientseitig Ende-zu-Ende-verschlüsselt. Der Dienst sieht weiterhin technische Metadaten. E2EE-Sicherheit setzt vertrauenswürdige Clients und unabhängig überprüfbare Schlüsselbindungen voraus.
-- **Sparsamer Betrieb:** Keine Kopien von Profilen oder Nachrichten-Klartexten als Datenhaltung. GitHub ist Quellcodehost, kein operatives Ledger.
-- **Keine eigene Kryptografie erfinden:** Etablierte, überprüfte Verfahren und Bibliotheken verwenden.
+- **Independent product:** Not part of PumpkinMe or FruitStack. Either may later integrate PAEP/P4P as a client or adapter. BlueberryMe is not a mandatory runtime dependency.
+- **JSON first:** No requirement to create an individual website for every user. JSON views are generated dynamically from minimal persistent state. A human-facing chat view is optional.
+- **Discoverable on the open web:** Public instructions and machine-readable discovery are available. Whether an agent can execute any operation depends on its host environment and granted permissions.
+- **No mandatory MCP:** HTTPS/JSON, authorized CLI/Code Mode operations, and controlled JSON file exchange share the same contract. MCP and agent skills are optional adapters or instructions.
+- **Separate authority:** Humans and agents have distinct permissions. An agent cannot replace human approval or authorization to disclose identity.
+- **Confidential communication:** Messages are designed to be end-to-end encrypted on the client before transmission. The service can still observe technical metadata. E2EE security depends on trustworthy clients and independently verifiable key bindings.
+- **Minimal storage:** Do not persist duplicate profiles or message plaintext. GitHub hosts source code, not the operational ledger.
+- **Do not invent cryptography:** Use established, audited standards and libraries.
 
-## Minimales Ablaufmodell
+## Minimal workflow
 
-1. Ein Mensch beauftragt einen vorhandenen Agenten, beispielsweise eine neue berufliche Möglichkeit zu suchen.
-2. Der Agent entdeckt eine öffentliche PAEP-Anleitung und verwendet – **nur sofern seine Laufzeit es erlaubt und der Mensch zustimmt** – den freigegebenen Zugang.
-3. PAEP erzeugt einen Endpunkt mit öffentlicher Kennung, minimalem Zustand und gesonderten Berechtigungen. Private Schlüssel bleiben in vertrauenswürdigen Clients.
-4. Ein anderer Endpunkt wird gefunden oder ausdrücklich adressiert. Eine Verbindung wird beantragt und von berechtigten Seiten akzeptiert.
-5. Ein widerrufbarer Lease autorisiert die Teilnahme an einem Kommunikationsraum.
-6. Endpunkte tauschen geprüfte öffentliche Schlüssel und verschlüsselte Nachrichten über den konfigurierten Transport aus.
-7. Menschen können über eine optionale Oberfläche mitlesen und antworten, **wenn sie im jeweiligen Nachrichtenkontext als Empfänger autorisiert sind**.
+1. A person asks an existing AI agent to accomplish a task, such as finding a new professional opportunity.
+2. The agent discovers the public PAEP instructions and uses an authorized access method **only if its runtime supports the operation and the person approves**.
+3. PAEP provisions an endpoint with a public identifier, minimal state, and distinct permissions. Private keys remain with trusted clients.
+4. A second endpoint is discovered or addressed explicitly. An authorized participant proposes a connection, and the relevant parties accept it.
+5. A revocable lease authorizes participation in a communication room.
+6. Endpoints exchange verified public-key information and encrypted messages over the configured transport.
+7. Humans can read and reply through an optional interface **only when they are authorized recipients in that message context**.
 
-## Begriffe
+## Terminology
 
-- **PAEP:** vorläufiger Eigenname für das Austauschprotokoll; die bisherige projektgebundene Langform ist **nicht** die Definition dieses eigenständigen Produkts.
-- **P4P:** Arbeitsbezeichnung für das Menschen-und-Agenten-Kommunikationsmodell mit vier möglichen Rollen.
-- **Endpoint:** adressierbarer Kommunikationsendpunkt mit ID, öffentlichen Schlüsselinformationen und Berechtigungszustand; keine zwingende HTML-Seite.
-- **Room:** freigegebene Beziehung zweier Endpunkte; speichert Teilnehmer, Leases, Ereignisstände und Chiffrate.
-- **Lease:** überprüfte, zeitlich und funktional begrenzte Berechtigung, nicht selbst ein Verschlüsselungsschlüssel.
-- **Relay:** Transport für Chiffrat und minimale Zustellmetadaten; darf nicht die Schlüsselhoheit erhalten.
+- **PAEP:** Provisional name of the exchange protocol. Its earlier PumpkinMe-specific expansion does **not** define this independent product.
+- **P4P:** Working name for the human-and-agent communication model with four possible roles.
+- **Endpoint:** Addressable communication resource with an ID, public-key information, and permission state; not necessarily an HTML page.
+- **Room:** Authorized relationship between two endpoints, tracking participants, leases, event revisions, and ciphertext.
+- **Lease:** Verified, time-limited and scope-limited authorization, not itself an encryption key.
+- **Relay:** Transport for ciphertext and minimal delivery metadata; never an authority over private keys.
 
-## Dokumentation
+## Documentation
 
-- [Produktkonzept und Abgrenzung](docs/PRODUCT_CONCEPT.md)
-- [PAEP-Protokollentwurf und JSON-Vertrag](docs/PROTOCOL.md)
-- [Sicherheits- und Vertrauensmodell](docs/SECURITY.md)
-- [Umsetzungsplan und messbare Abnahme](docs/MVP.md)
-- [Getroffene Entscheidungen und offene Punkte](docs/DECISIONS.md)
+- [Product concept and scope](docs/PRODUCT_CONCEPT.md)
+- [PAEP protocol draft and JSON contract](docs/PROTOCOL.md)
+- [Security and trust model](docs/SECURITY.md)
+- [MVP plan and acceptance criteria](docs/MVP.md)
+- [Architecture decisions and open questions](docs/DECISIONS.md)
 
-## Technische Richtung
+## Technical direction
 
-**TypeScript** für Protokollkern und JSON-API, **DuckDB** als sparsamer Persistenzkandidat für den ersten eigenständigen Dienst, **n8n** als austauschbarer Relay-Adapter. Die Software muss lokal ohne externe KI und ohne MCP testbar sein. Keine GitHub Actions/CI als Voraussetzung.
+**TypeScript** for the protocol core and JSON API; **DuckDB** as a minimal persistence candidate for the first standalone service; **n8n** as a replaceable relay adapter. The system must be testable locally without external AI services or MCP. GitHub Actions/CI are not required.
 
-## Grenzen
+## Current limitations
 
-Dieses Repository beschreibt zunächst ein Zielbild. Keine fertige Verschlüsselung, produktive Sicherheit, unabhängige Protokoll-Neuheit, gesetzliche Konformität, automatische ChatGPT-Entdeckung oder garantierte Plattformkompatibilität wird behauptet.
+This repository currently documents a target design. It does not claim working encryption, production-grade security, independently established protocol novelty, regulatory compliance, automatic discovery by ChatGPT, or guaranteed compatibility with any agent platform.
 
-Lizenz: [MIT](LICENSE).
+License: [MIT](LICENSE).

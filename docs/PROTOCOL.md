@@ -1,65 +1,65 @@
-# PAEP — Protokollentwurf für P4P
+# PAEP — Protocol Draft for P4P
 
-**Stand:** Entwurf 0.1, 2026-11-23. **Nicht implementiert.** Die beschriebenen Pfade und Nachrichtentypen sind ein erster Vertrag zur Prüfung, keine registrierten Internetstandards oder produktive URLs.
+**Status:** Draft 0.1, 2026-11-23. **Not implemented.** The paths and message types below are an initial contract for review, not registered Internet standards or deployed URLs.
 
-## 1. Schichten
+## 1. Layers
 
-1. **Discovery**: beschreibt Versionen, Operationen und erlaubte Transportbindungen öffentlich.
-2. **Resource Model**: Endpunkt, Akteur, Raum, Lease, Schlüsselbindung, Nachricht, Änderungs-Cursor.
-3. **Authority**: überprüft Identität/Delegation, Rollen, Umfang, Ablaufdatum, Widerruf und Versionsbedingungen.
-4. **Messaging**: Nachrichtenhülle und opakes Chiffrat; vertrauliche Nutzdaten werden nur am autorisierten Client verarbeitet.
-5. **Transport**: zunächst HTTPS/JSON; derselbe Bedeutungsvertrag für CLI, kontrollierten Dateiimport und optional MCP.
-6. **Presentation**: optionaler Menschenchat über dieselben Zustände; keine eigene Protokolllogik.
+1. **Discovery:** Publicly describes supported versions, operations, and transport bindings.
+2. **Resource model:** Endpoint, principal, room, lease, key binding, message, and change cursor.
+3. **Authority:** Verifies identity and delegation, roles, scopes, expiration, revocation, and version preconditions.
+4. **Messaging:** Message envelope and opaque ciphertext; confidential payloads are processed only by authorized clients.
+5. **Transport:** Initially HTTPS/JSON, with identical operation semantics for CLI, controlled file import, and optional MCP.
+6. **Presentation:** Optional human chat displaying the same state, with no separate protocol logic.
 
-Eine GUID bezeichnet eine Ressource und ist **niemals** allein ein Authentifizierungsmerkmal.
+A GUID identifies a resource and **never acts as authentication on its own**.
 
-## 2. Entitäten
+## 2. Entities
 
-| Entität | Minimale Bedeutung |
+| Entity | Minimum meaning |
 |---|---|
-| `endpointId` | opake zufällige Endpunktkennung; öffentlich höchstens ohne vertraulichen Zustand |
-| `principalId` | authentifizierter Mensch, organisatorischer Vertreter oder delegierter Agent |
-| `role` | `human`, `organization_human`, `agent`; tatsächliche Scope-Prüfung separat |
-| `roomId` | Kommunikationsraum, der genau zwei Seiten/Endpunkte verknüpft (mehrere berechtigte Akteure möglich) |
-| `leaseId` | zeitlich begrenzte Zuordnung von Berechtigungen zu Raum, Akteur, Zweck und Revision |
-| `keyId` | Fingerprint/Referenz eines überprüften öffentlichen Empfängerschlüssels; keine private Schlüsselablage |
-| `messageId` | zufällige deduplizierbare Nachrichtenkennung |
-| `cursor` | raumgebundene, monotone Änderungsposition; kein global lesbarer Aktivitätsfeed |
+| `endpointId` | Random opaque endpoint identifier; public visibility never includes private state |
+| `principalId` | Authenticated human, organizational representative, or delegated agent |
+| `role` | `human`, `organization_human`, or `agent`; actual permission scopes are checked separately |
+| `roomId` | Room linking exactly two sides/endpoints (potentially with multiple authorized principals) |
+| `leaseId` | Time-limited authorization binding principal, room, purpose, permissions, and revision |
+| `keyId` | Fingerprint or reference of a verified public recipient key; no private-key storage |
+| `messageId` | Random message ID supporting deduplication |
+| `cursor` | Monotonic, room-scoped change position; never a globally readable activity feed |
 
-Der Client verwahrt private Schlüssel. Eine veröffentlichte Key-ID bestätigt allein **noch nicht** die Identität des Schlüsselinhabers.
+Private keys remain with the client. Publishing a key identifier **does not by itself establish** the key holder's identity.
 
-## 3. Operationen (plattformunabhängig)
+## 3. Platform-independent operations
 
-| Aktion | Zweck | Sicherheit |
+| Operation | Purpose | Security rule |
 |---|---|---|
-| `DISCOVER` | öffentlich verfügbare Protokollinformationen lesen | kein privater Zustand |
-| `ENDPOINT_CREATE` | eigener Endpunkt für authentifizierten Principal | gedrosselt, kein impliziter Agentenzugriff |
-| `KEY_REGISTER` | öffentlichen Schlüssel und Besitznachweis hinterlegen | signierter Besitznachweis, Bindung verifizieren |
-| `DELEGATE` | Agenten Rechte einräumen | nur legitimierter Mensch/Organisationsvertreter |
-| `ROOM_PROPOSE` | zweitem Endpunkt eine Verbindung vorschlagen | nur berechtigter Principal |
-| `ROOM_ACCEPT` | Verbindung bestätigen und scoped Lease ausstellen | beide Seiten/Policies müssen zustimmen |
-| `MESSAGE_SEND` | verschlüsselte Nachricht an definierte Empfänger übermitteln | Lease, Senderauthentizität, Replay-Schutz |
-| `CHANGES_READ` | neue autorisierte Ereignisse nach Cursor abrufen | Empfangsberechtigung, Pagination/Quotas |
-| `MESSAGE_ACK` | Zustell-/Abrufstatus melden | keine Aussage über menschliches Lesen |
-| `LEASE_REVOKE` | künftigen Zugriff beenden | widerrufsberechtigter Principal/Authority |
-| `KEY_ROTATE` | neue Schlüsselbindung mit Nachweis etablieren | keine stillschweigende Substitution |
+| `DISCOVER` | Read publicly available protocol information | No private state |
+| `ENDPOINT_CREATE` | Provision an endpoint for an authenticated principal | Rate-limited; no implicit agent access |
+| `KEY_REGISTER` | Register a public key and proof of possession | Verify signed possession proof and identity binding |
+| `DELEGATE` | Authorize an agent | Only legitimate human or organizational representative |
+| `ROOM_PROPOSE` | Propose a connection to another endpoint | Requires an authorized principal |
+| `ROOM_ACCEPT` | Confirm pairing and issue scoped lease | Requires both parties' approvals and applicable policies |
+| `MESSAGE_SEND` | Submit ciphertext for explicitly specified recipients | Lease, sender authenticity, and replay protection |
+| `CHANGES_READ` | Retrieve authorized changes after a cursor | Read permission, pagination, and quotas |
+| `MESSAGE_ACK` | Acknowledge delivery or retrieval | Does not imply that a human read the message |
+| `LEASE_REVOKE` | Terminate future access | Authorized principal or authority only |
+| `KEY_ROTATE` | Establish a new verified key binding | No silent key substitution |
 
-**Keine Operation `IDENTITY_REVEAL` im generischen Kern.** Anwendungen dürfen zusätzliche menschliche Freigabeprozesse anknüpfen; deren Rechte dürfen nicht aus einer Agent-Delegation abgeleitet werden.
+The generic core has **no `IDENTITY_REVEAL` operation**. Applications may implement separate human approval procedures; agent delegation must never imply the ability to reveal identity.
 
-## 4. Discovery über reguläre Webseiten
+## 4. Discovery on ordinary websites
 
-- `GET /for-agents`: öffentlich indexierbare, erklärende HTML-Einstiegsseite als Auffindbarkeitshilfe; keine private Endpunktseite.
-- `GET /.well-known/paep.json`: vorgeschlagene maschinenlesbare Discovery-Adresse. Der Name ist **noch kein registrierter Well-Known-URI-Standard**.
-- Discovery liefert Protokollversionen, Schemas/Verträge, erlaubte Transports, dokumentierte Grenzen und die öffentlichen API-Pfade. Keine Geheimnisse, persönlichen Endpunktinhalte oder privaten Schlüssel.
+- `GET /for-agents`: Publicly indexable explanatory HTML entry page, not a private endpoint page.
+- `GET /.well-known/paep.json`: Proposed machine-readable discovery location; this name is **not yet a registered well-known URI standard**.
+- Discovery provides supported protocol versions, schemas/contracts, transport options, documented limits, and public API routes. It includes no secrets, personal endpoint data, or private keys.
 
-Das Anzeigen oder Lesen dieser Informationen ist keine Einwilligung zu Uploads. Ein Agent benötigt Host-seitig tatsächlich freigegebene HTTP-, Browser-, Datei- oder CLI-Aktionen.
+Reading a discovery page does not constitute consent to upload data. An agent needs actual, host-authorized HTTP, browser, file, or CLI capabilities.
 
-## 5. Vorläufige HTTPS-Bindings
+## 5. Provisional HTTPS bindings
 
-| Methode / Pfad | Aktion |
+| Method / path | Operation |
 |---|---|
 | `POST /v1/endpoints` | ENDPOINT_CREATE |
-| `GET /v1/endpoints/{endpointId}` | autorisierte dynamische JSON-Ansicht |
+| `GET /v1/endpoints/{endpointId}` | Authorized dynamic JSON view |
 | `POST /v1/endpoints/{endpointId}/keys` | KEY_REGISTER / KEY_ROTATE |
 | `POST /v1/endpoints/{endpointId}/delegations` | DELEGATE |
 | `POST /v1/rooms` | ROOM_PROPOSE |
@@ -69,9 +69,9 @@ Das Anzeigen oder Lesen dieser Informationen ist keine Einwilligung zu Uploads. 
 | `POST /v1/rooms/{roomId}/messages/{messageId}/ack` | MESSAGE_ACK |
 | `POST /v1/leases/{leaseId}/revoke` | LEASE_REVOKE |
 
-Alle privaten Operationen benötigen **transportgebundene, überprüfte Authentifizierung und Autorisierung**. Es darf keine als Geheimnis missbrauchbare ID oder ein Token in einer öffentlichen URL oder in einem protokollierten JSON-Payload stehen.
+Every private operation requires **verified authentication and authorization bound to the transport**. Public URLs and logged JSON payloads must not carry usable secrets, regardless of how opaque their resource IDs look.
 
-## 6. Beispiel einer dynamischen, authentifizierten Endpunktansicht
+## 6. Example: Dynamic authenticated endpoint view
 
 ~~~json
 {
@@ -89,9 +89,9 @@ Alle privaten Operationen benötigen **transportgebundene, überprüfte Authenti
 }
 ~~~
 
-Dies ist ein **synthetisches Schema-Beispiel**, nicht die endgültige JSON-Schema-Datei. Eine reale Response würde nur die gemäß Principal/Rechten erlaubten Schlüssel- und Raumdaten zurückgeben. Öffentliche Schlüssel werden separat als überprüfbare kryptografische Daten geliefert; `verified` allein ersetzt keine unabhängige Schlüsselauthentifizierung.
+This is a **synthetic schema example**, not the final JSON Schema file. A real response would include only key and room details permitted for the authenticated principal. Public keys are delivered separately as verifiable cryptographic data. A `verified` boolean alone does not replace independent key authentication.
 
-## 7. Nachrichtenhülle (synthetisches Beispiel)
+## 7. Message envelope (synthetic example)
 
 ~~~json
 {
@@ -113,29 +113,29 @@ Dies ist ein **synthetisches Schema-Beispiel**, nicht die endgültige JSON-Schem
 }
 ~~~
 
-Werte zwischen spitzen Klammern sind Platzhalter, **keine lauffähige Kryptografie**. Die finale Verschlüsselungssuite, der Signaturumfang, die kanonische Serialisierung, Nonce-Regeln und das wire-kompatible JSON Schema sind vor der Implementierung verbindlich festzulegen und durch Vektortests abzusichern. Die `leaseId` ist eine Referenz, nicht der Zugriffsnachweis.
+Values in angle brackets are placeholders, **not working cryptography**. The final cipher suite, signature coverage, canonical serialization, nonce rules, and wire-compatible JSON Schema must be specified before implementation and validated with test vectors. The `leaseId` is a reference, not proof of access.
 
-**Kritisch:** Die Empfängerliste bestimmt, welche Rollen Klartext erhalten dürfen. Mensch und Agent besitzen **getrennte Schlüssel**. Agenten sehen menschlich private Nachrichten nur, wenn sie explizit als Empfänger beziehungsweise autorisierte Verarbeitungspartner festgelegt wurden.
+**Critical:** The recipient list defines which roles may receive plaintext. Humans and agents have **separate keys**. Agents may access human-private messages only if explicitly authorized as recipients or processing parties.
 
-## 8. Zustandsautomaten (Zielentwurf)
+## 8. State machines (target design)
 
-- Endpunkt: `CREATED → ACTIVE → SUSPENDED / CLOSED`.
-- Raum: `PROPOSED → ACCEPTED → ACTIVE → REVOKED / CLOSED`. Vor `ACTIVE` ist `MESSAGE_SEND` verboten.
-- Lease: `ISSUED → ACTIVE → EXPIRED / REVOKED`; kein Wiederaktivieren eines widerrufenen Lease.
-- Nachricht: `RECEIVED → QUEUED → DELIVERED/EXPIRED`; quittierter Empfang bedeutet **nicht**, dass ein Mensch gelesen oder zugestimmt hat.
+- Endpoint: `CREATED → ACTIVE → SUSPENDED / CLOSED`.
+- Room: `PROPOSED → ACCEPTED → ACTIVE → REVOKED / CLOSED`. `MESSAGE_SEND` is prohibited before `ACTIVE`.
+- Lease: `ISSUED → ACTIVE → EXPIRED / REVOKED`; a revoked lease cannot be reactivated.
+- Message: `RECEIVED → QUEUED → DELIVERED/EXPIRED`. A delivery acknowledgement **does not mean** a human has read or approved a message.
 
-Jede zustandsändernde Anfrage benötigt idempotente Behandlung, erwartete Revision und rechtmäßigen Rollen-/Scope-Nachweis. Unbekannte Felder und ungeprüfte Versionen werden abgelehnt.
+Every state-changing request requires idempotent handling, an expected revision, and verified role/scope authority. Unknown fields and unsupported versions are rejected.
 
-## 9. Synchronisierung und Fehler
+## 9. Synchronization and errors
 
-- Monotone, raumbezogene Cursors; inkrementelle Änderungen, keine vollständige Profil- oder Chatreplikation bei jedem Abruf.
-- Nachrichten-IDs für Deduplizierung, TTL und begrenzte Retries; bei Verbindungsabbrüchen sicher wiederholbar.
-- `401` fehlende/ungültige Authentifizierung; `403` fehlende Autorität; `404` nicht sichtbare Ressource; `409` Versionskonflikt; `410` abgelaufene/gelöschte Ressource; `429` Rate-Limit.
-- Dasselbe fachliche Fehlerobjekt gilt für CLI und Datei-Transport, unabhängig vom HTTP-Code.
-- Signierte/offline importierte Nachrichten müssen dieselben Rechte- und Replay-Prüfungen bestehen wie Live-HTTP.
+- Monotonic room-scoped cursors and incremental changes; no complete profile or chat replication on every read.
+- Message IDs for deduplication, TTL, and bounded retries; safe replay of requests after disconnection.
+- `401` missing/invalid authentication; `403` insufficient authority; `404` resource not visible; `409` revision conflict; `410` expired/deleted resource; `429` rate limit.
+- The same protocol-level error object applies to CLI and file transports independently of HTTP status codes.
+- Signed or offline-imported messages must pass the same authorization and replay checks as live HTTPS messages.
 
-## 10. Protokollgrenzen
+## 10. Protocol boundaries
 
-PAEP transportiert keine allgemeinen LLM-Prompts als ausführbare Systemanweisungen. Sichtbare Nachrichten und Discovery-Texte werden als **untrusted content** behandelt. Das Protokoll löst weder selbst Agentenaktionen aus noch erstellt es ohne Host-Unterstützung ChatGPT-Aufgaben, Push-Nachrichten oder Hintergrundsitzungen.
+PAEP does not treat general LLM prompts as executable system instructions. Received messages and discovery documents are **untrusted content**. The protocol does not itself execute agent actions, create ChatGPT tasks, send push notifications, or schedule background sessions without explicit support from the host environment.
 
-Für die erste Version bleibt die Raumbindung bei **zwei Endpunkten**; spätere Mehrparteien-/Gerätemodelle erfordern ein eigenständiges, geprüftes Gruppen-Schlüsselmanagement.
+The first version binds **two endpoints** per room. Later multi-party or multi-device designs require separately reviewed group key management.

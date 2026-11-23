@@ -1,73 +1,73 @@
-# PAEP / P4P — eigenständiges Produktkonzept
+# PAEP / P4P — Standalone Product Concept
 
-**Version:** Konzept v0.1, 2026-11-23  
-**Geltung:** Eigenständiger Kommunikationsdienst. PumpkinMe ist der erste denkbare Anwendungsfall, aber keine Architekturvoraussetzung.
+**Version:** Concept v0.1, 2026-11-23  
+**Scope:** An independent communication service. PumpkinMe is a potential first application, not an architectural dependency.
 
-## 1. Problem und Lösung
+## 1. Problem and solution
 
-Menschen und Unternehmen verwenden unterschiedliche KI-Assistenten. Ein gemeinsamer Agenten- und Nachrichtenraum darf weder eine bestimmte KI-Plattform noch MCP noch eine installierte native App voraussetzen.
+People and companies use different AI assistants. A shared agent and messaging space must not require a specific AI platform, MCP, or an installed native app.
 
-PAEP definiert einen **dynamischen, strukturierten JSON-Kommunikationsendpunkt** und dessen Operationen. P4P erweitert die direkte Teilnehmerbeziehung um autorisierte Vertreter: zwei menschliche/organisatorische Seiten und ihre jeweiligen Agenten. Der Dienst **vermittelt Endpunkte und Berechtigungen**, betreibt aber nicht die KI-Agenten selbst.
+PAEP defines a **dynamic, structured JSON communication endpoint** and the operations available on it. P4P extends direct communication between participants to authorized representatives: two human or organizational sides and their respective agents. The service **brokers endpoints and permissions**; it does not host the AI agents.
 
-Die frühere Idee individueller Webseiten wird vereinfacht: **Eine Webseite ist eine optionale Ansicht des Endpunkts, nicht der Endpunkt selbst.** Der Kommunikationsraum entsteht aus zwei Endpunktreferenzen, genehmigten Leases, kryptografisch verifizierbaren Empfängerschlüsseln und einem Nachrichtentransport.
+This simplifies the earlier idea of individual websites: **A website is an optional view of an endpoint, not the endpoint itself.** The communication room is established from two endpoint references, approved leases, cryptographically verifiable recipient keys, and a message transport.
 
-## 2. Zwei Seiten, vier mögliche Rollen
+## 2. Two sides, four possible roles
 
-| Seite A | Seite B | Prinzip |
+| Side A | Side B | Principle |
 |---|---|---|
-| Mensch A / Organisation A | Mensch B / Organisation B | menschliche Entscheidung und Verantwortung |
-| Agent A (bevollmächtigt) | Agent B (bevollmächtigt) | begrenzte Delegation im Auftrag der jeweiligen Seite |
+| Human A / Organization A | Human B / Organization B | Human decision-making and accountability |
+| Agent A (delegated) | Agent B (delegated) | Limited authority on behalf of each side |
 
-Vier Rollen sind **keine Vorgabe von vier gleichzeitigen Netzwerkverbindungen**. Ein Mensch kann ohne Agent arbeiten; Agenten können zeitversetzt Nachrichten austauschen. „Organisation“ bedeutet eine geprüfte organisatorische Identität und einen konkreten menschlichen Entscheidungsträger, nicht eine frei behauptete Firmenzugehörigkeit.
+Four roles **do not require four simultaneous network connections**. A human may participate without an agent; agents may exchange messages asynchronously. “Organization” means a verified organizational identity and an identifiable responsible human decision-maker, not an unverified claim of company affiliation.
 
-Beispiel: Ein persönlicher Agent findet eine berufliche Gelegenheit, der Unternehmensagent fragt nach Verfügbarkeit, eine menschliche Person antwortet direkt, und beide Menschen entscheiden über die Freigabe weiterer Daten. Der PAEP-Kern kennt dafür **keine Job-Semantik**: Andere Dienste können dieselben Kommunikationsräume für Projektarbeit, Kundengespräche oder Kooperation verwenden.
+Example: A personal agent discovers an employment opportunity, a company agent asks about availability, a human replies directly, and the two people decide whether more information may be released. The PAEP core has **no job-specific semantics**: other services can use the same communication rooms for project work, customer conversations, or collaboration.
 
-## 3. Der Produktkern
+## 3. Product core
 
-1. **Discovery**: Eine öffentliche, für reguläre Suchmaschinen auffindbare Einstiegsseite verweist auf eine maschinenlesbare Protokollbeschreibung. Untrusted Web-Inhalte sind keine Autorisierung.
-2. **Provisioning**: Auf zulässige Anfrage wird ein Endpunkt mit zufälliger opaker ID erzeugt; der JSON-Zustand entsteht dynamisch aus minimalen persistenten Datensätzen.
-3. **Delegation**: Der jeweilige Mensch beziehungsweise eine legitimierte Organisation erteilt einem Agenten ausdrücklich begrenzte Lese-/Schreibrechte.
-4. **Pairing**: Die Seiten schlagen die Verknüpfung ihrer Endpunkte vor und bestätigen den erlaubten Zweck. Es gibt keinen unkontrollierten Join durch Kenntnis einer GUID.
-5. **Lease**: Der Vermittlungsdienst prüft Raum, Teilnehmer, Berechtigungen, Laufzeit, Widerruf und Revision.
-6. **Schlüsselaustausch**: Pro teilnahmeberechtigter Identität wird ein überprüfbarer öffentlicher Schlüssel gebunden. Private Entschlüsselungsschlüssel verlassen den vertrauenswürdigen Client nicht.
-7. **Nachrichten**: Ein autorisierter Absender verschlüsselt für die erlaubten Empfänger; das Relay stellt Chiffrat und Zustellinformationen bereit.
-8. **Menschliche Ansicht**: Optionaler Browser-Chat für Lesen, Antworten, Widerrufen und Rechtefreigaben; er greift auf denselben JSON-Vertrag zu.
+1. **Discovery:** A publicly accessible landing page, discoverable by standard search engines, points to a machine-readable protocol description. Untrusted web content does not grant authorization.
+2. **Provisioning:** An eligible request creates an endpoint with a random opaque ID. The JSON state is generated dynamically from minimal persistent records.
+3. **Delegation:** Each human or legitimate organizational representative grants an agent explicitly limited read/write rights.
+4. **Pairing:** The parties propose a connection between their endpoints and confirm its authorized purpose. Knowledge of a GUID alone never grants room access.
+5. **Lease:** The broker checks the room, participants, permissions, duration, revocation, and resource revision.
+6. **Key exchange:** Each eligible principal has a bound, verifiable public key. Private decryption keys never leave the trusted client.
+7. **Messaging:** An authorized sender encrypts for permitted recipients; the relay delivers ciphertext and minimal delivery information.
+8. **Human view:** An optional browser chat supports reading, replying, revoking, and approving permissions through the same JSON contract.
 
-## 4. Was bewusst nicht gespeichert wird
+## 4. Deliberately excluded from storage
 
-Der generische PAEP-Kern braucht **keinen** zentralen Fähigkeitsgraphen, Lebenslauf, Firmenstamm, vollständigen Gesprächsklartext oder proprietären Agenten-Context. Diese gehören – sofern erforderlich – in die Anwendungsebene oder bleiben beim jeweiligen Teilnehmer.
+The generic PAEP core does **not** need a central skill graph, résumé, company registry, full chat plaintext, or proprietary agent context. Such data belongs to the application layer when needed, or remains with the respective participant.
 
-Minimaler persistenter Zustand: Endpunkt-IDs, öffentliche Schlüssel und deren bestätigte Bindungen, Rollen/Autorisierungen, Lease-Zustände, Raumbeziehungen, Nachrichten-Chiffrate mit minimaler Zustellung, sequenzielle Änderungsstände sowie begrenzte technische Nachweise. JSON-Dokumente werden daraus bei Bedarf zusammengesetzt, nicht pro Anfrage vollständig dupliziert.
+Minimal persistent state consists of endpoint IDs, public keys and their verified bindings, roles and authorizations, lease states, room relationships, message ciphertext with minimal delivery data, sequential change positions, and bounded technical evidence. JSON documents are assembled on request rather than copied in full after every change.
 
-Die Domain-Applikation kann optionale, freigegebene JSON-Felder referenzieren; kein Profilinhalt wird allein durch eine Endpunkt-ID öffentlich.
+A domain-specific application may reference optional, approved JSON fields. An endpoint ID never makes profile contents public by itself.
 
-## 5. Schnittstellen ohne Bindung an einen Anbieter
+## 5. Vendor-independent interfaces
 
-- **Web + JSON:** indexierbarer Einstieg, öffentliches Discovery-Dokument, authentifizierte JSON-Operationen.
-- **CLI / Code Mode:** äquivalente Aufrufe für zugelassene Claude-Code-, GitHub-Copilot- und andere lokale Agenten.
-- **Dateiaustausch:** geprüftes Import-/Exportformat für isolierte Unternehmensumgebungen; gleiche Signatur-/Revisions-/Replay-Regeln.
-- **Agent Skills:** erklärende, optional installierbare Instruktionen. Keine Autorität allein durch Installation.
-- **MCP:** rein optionaler Adapter, falls organisatorisch erlaubt.
-- **Menschliche Oberfläche:** optional, aus demselben Protokollzustand; kein zweites Chat-Backend.
+- **Web + JSON:** Indexable entry point, public discovery document, authenticated JSON operations.
+- **CLI / Code Mode:** Equivalent operations for authorized Claude Code, GitHub Copilot, and other local agents.
+- **File exchange:** Verified import/export format for isolated enterprise environments, with the same signing, revision, and replay protections.
+- **Agent skills:** Explanatory, optionally installed instructions. Installation alone conveys no authority.
+- **MCP:** Strictly optional adapter where enterprise policy permits it.
+- **Human interface:** Optional presentation of the same protocol state, not a second chat backend.
 
-Microsoft Copilot/Copilot Studio und GitHub Copilot sind getrennte Integrationsumgebungen; konkrete Funktionsverfügbarkeit und Unternehmensrichtlinien müssen je Umgebung getestet werden.
+Microsoft Copilot/Copilot Studio and GitHub Copilot are distinct integration targets. Specific capabilities and enterprise policies must be tested for each environment.
 
-## 6. Positionierung
+## 6. Product positioning
 
-PAEP/P4P ist zunächst ein **Kommunikations- und Berechtigungssystem**, weder Stellenbörse noch genereller Agenten-Host noch soziales Netzwerk. Es kann später in andere Produkte eingebettet oder direkt als eigenständiger Dienst genutzt werden.
+PAEP/P4P is first a **communication and authorization system**, not a job board, general-purpose agent host, or social network. It may later be embedded in other products or offered as an independent service.
 
-Die technischen Bausteine sind nicht neu: A2A, ANP, DIDComm, Matrix, MLS und bestehende Public-Key-Verfahren bilden wichtige Vorarbeiten. Ein möglicher Unterschied liegt in der kombinierten **automatischen Erzeugung zugänglicher JSON-Endpunkte, vier ausdrücklich getrennten Rollen, menschlich kontrollierten Leases und der herstellerunabhängigen Nutzung ohne MCP**. Neuheit, Schutzfähigkeit und Marktpotenzial sind **nicht** bewiesen.
+Its technical building blocks are not new: A2A, ANP, DIDComm, Matrix, MLS, and established public-key cryptography are important prior art. A possible differentiator is the combined **automatic provisioning of accessible JSON endpoints, four explicitly separated roles, human-controlled leases, and vendor-independent access without MCP**. Novelty, protectability, and market potential have **not** been demonstrated.
 
-## 7. Nichtziele der ersten Version
+## 7. Non-goals of the first release
 
-- Kein eigener LLM-Host und keine automatische Agentenausführung.
-- Kein eigener kryptografischer Algorithmus, kein unprüfbares „Sicherheitsversprechen“.
-- Keine Verarbeitung von Bewerberdaten als Voraussetzung des Kommunikationskerns.
-- Keine Pflichtregistrierung über einen bestimmten KI-Anbieter.
-- Keine Verpflichtung zur permanenten Online-Präsenz eines Fremdagenten.
-- Keine vollumfängliche Unternehmensplattform, Zahlungsabwicklung oder Massengruppenchat in v0.1.
-- Keine Kopie von PumpkinMe-Modulen; generische Verknüpfung über Schnittstellen.
+- No proprietary LLM host or automatic execution of remote agents.
+- No custom cryptographic algorithm or unverified security guarantees.
+- No requirement to process applicant data in the communication core.
+- No mandatory sign-up with any AI provider.
+- No assumption that external agents remain online continuously.
+- No full enterprise platform, billing, or large-scale group chat in v0.1.
+- No copying PumpkinMe modules; integration only through generic interfaces.
 
-## 8. Erfolgskriterium des Produkts
+## 8. Product success criterion
 
-Zwei voneinander unabhängige Clients, darunter mindestens ein Agentenadapter und eine menschliche Oberfläche, können eigene Endpunkte provisionieren, getrennte Rechte nachweisen, nach gegenseitiger Freigabe einen Raum erzeugen, authentifizierte Ende-zu-Ende-verschlüsselte Nachrichten austauschen, Nachrichten nach Offline-Zeit abrufen und nach Widerruf keine neuen Zustellungen über den widerrufenen Lease vornehmen. Das Verhalten muss **ohne MCP und ohne PumpkinMe** funktionieren.
+Two independently launched clients, including at least one agent adapter and one human interface, can provision their own endpoints, demonstrate separate permissions, create a room with mutual authorization, exchange authenticated end-to-end encrypted messages, retrieve messages after an offline interval, and prevent further deliveries through a revoked lease. This must work **without MCP and without PumpkinMe**.
